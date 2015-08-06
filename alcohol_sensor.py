@@ -155,7 +155,7 @@ def usage_example():
 		concent = alchl_sensor.getConcentration()
 
 		# Print out results
-		print "alcohol %d" % concent
+		print "alcohol %f" % concent
 
 		# Delay seconds
 		time.sleep(delay)
