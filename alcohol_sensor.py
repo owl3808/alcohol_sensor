@@ -16,6 +16,7 @@ class alcohol_sensor:
 		self.Rl = 200000 # load resistance
 		self.RsroToConcentFile = 'MQ3Data.json'
 		self.ResistToConcent = []
+		self._loadMQ3Data()
 
 	def _loadMQ3Data(self):
 		json_text = open(self.RsroToConcentFile).read()
@@ -53,8 +54,25 @@ class alcohol_sensor:
 		resist = self._ConvertVoltsToResist(volts)
 		return resist
 
+	def getConcentration(self):
+		volts = self.getVolts()
+		resist = self._ConvertVoltsToResist(volts)
+		concent = self._convertResistToConcentration(resist)
+		return concent
+
 	def _convertResistToConcentration(self, resist):
-		return 'function undefined'
+		interval = self._findResistInterval(resist)
+		if interval==-1:
+			return 0
+		if interval == len(self.ResistToConcent)-1:
+			return 9999
+		# interpolation method to get concentation
+		resist_l = self.ResistToConcent[interval][0]
+		resist_h = self.ResistToConcent[interval+1][0]
+		concent_l = self.ResistToConcent[interval][1]
+		concent_h = self.ResistToConcent[interval+1][1]
+		concent = concent_l + ((np.abs(resist - resist_l)/np.abs(resist_h-resist_l))*(concent_h - concent_l))
+		return concent
 
 	def _findResistInterval(self, resist):
 		if resist < self.ResistToConcent[0][0]: # smaller then first one
@@ -64,6 +82,7 @@ class alcohol_sensor:
 				return i
 		else:
 			return len(self.ResistToConcent)-1
+
 
 # Unit test
 class Test_AlcoholSensor(unittest.TestCase):
@@ -102,10 +121,20 @@ class Test_AlcoholSensor(unittest.TestCase):
 		self.assertTrue(len(self.my_alcohol_sensor.ResistToConcent)>0)
 
 	def test_convertResistToConcentration(self):
-		self.my_alcohol_sensor._convertResistToConcentration(1)
+		self.my_alcohol_sensor.ResistToConcent = [[1,0],[2,1],[3,2],[5,3],[6,2],[9,1],[22,0]]
+		concert = self.my_alcohol_sensor._convertResistToConcentration(0.5)
+		self.assertEqual(0, concert)
+		concert = self.my_alcohol_sensor._convertResistToConcentration(1.5)
+		self.assertEqual(0.5, concert)
+		concert = self.my_alcohol_sensor._convertResistToConcentration(3.2)
+		self.assertEqual(2.1, concert)
+		concert = self.my_alcohol_sensor._convertResistToConcentration(5.2)
+		self.assertEqual(2.8, concert)
+		concert = self.my_alcohol_sensor._convertResistToConcentration(25)
+		self.assertEqual(9999, concert)
 
 	def test_findResistInterval(self):
-		self.my_alcohol_sensor.ResistToConcent = [[1,0],[2,0],[3.0],[5,0],[6,0],[9,0],[22,0]]
+		self.my_alcohol_sensor.ResistToConcent = [[1,0],[2,0],[3,0],[5,0],[6,0],[9,0],[22,0]]
 		interval = self.my_alcohol_sensor._findResistInterval(1.5)
 		self.assertEqual(0, interval)
 		interval = self.my_alcohol_sensor._findResistInterval(4.4)
@@ -117,27 +146,21 @@ class Test_AlcoholSensor(unittest.TestCase):
 		interval = self.my_alcohol_sensor._findResistInterval(23)
 		self.assertEqual(6, interval)
 
-'''def usage_example():
-	alcohol_sensor(ch=0)
-	# Definedd sensor channels
-	alcohol_ch = 0
-	
+def usage_example():
+	alchl_sensor = alcohol_sensor(ch=0)
 	# Define delay between readings
 	delay = 1
 
 	while True:
-		# Read the light sensor data
-		alcohol_data = ReadADC(alcohol_ch)
-		alcohol_volts = ReadVolts(alcohol_data,2)
-		alcohol_resist = ConvertVoltsToResist(alcohol_volts)
+		concent = alchl_sensor.getConcentration()
 
 		# Print out results
-		print "%.2f (V) %.0f (Ohm)" % (alcohol_volts, alcohol_resist)
+		print "alcohol %d" % concent
 
 		# Delay seconds
 		time.sleep(delay)
-'''
+
 
 if __name__ == '__main__':
-	unittest.main()
-	#usage_example()
+	#unittest.main()
+	usage_example()
