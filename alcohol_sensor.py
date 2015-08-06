@@ -2,6 +2,7 @@ import spidev
 import time
 import os
 import unittest
+import json
 
 class alcohol_sensor:
 	def __init__(self, ch):
@@ -12,6 +13,15 @@ class alcohol_sensor:
 		self.alcohol_ch = ch
 		self.Vc = 5 # referance voltage
 		self.Rl = 200000 # load resistance
+		self.RsroToConcentFile = 'MQ3Data.json'
+		self.ResistToConcent = []
+
+	def _loadMQ3Data(self):
+		json_text = open(self.RsroToConcentFile).read()
+		data = json.loads(json_text)
+		RsroToConcent = data['RsroConcentration_Mapping']
+		Ro = data['Ro']
+		self.ResistToConcent = [ [i[0]*Ro, i[1]] for i in RsroToConcent]
 
 	# Read SPI data from MCP3008, Channel must be an integer 0-7
 	def _ReadADC(self):
@@ -76,6 +86,13 @@ class Test_AlcoholSensor(unittest.TestCase):
 		resist = self.my_alcohol_sensor.getResist()
 		self.assertEqual(float, type(resist))
 
+	def test_loadRsroToConcentationTable(self):
+		self.my_alcohol_sensor._loadMQ3Data()
+		self.assertEqual(list, type(self.my_alcohol_sensor.ResistToConcent))
+		self.assertTrue(len(self.my_alcohol_sensor.ResistToConcent)>0)
+
+	def test_ConvertResistToConcentration(self):
+		self.my_alcohol_sensor._ConvertResistToConcentration(1)
 
 '''def usage_example():
 	alcohol_sensor(ch=0)
