@@ -3,6 +3,7 @@ import time
 import os
 import unittest
 import json
+import numpy as np
 
 class alcohol_sensor:
 	def __init__(self, ch):
@@ -52,8 +53,17 @@ class alcohol_sensor:
 		resist = self._ConvertVoltsToResist(volts)
 		return resist
 
-	def _ConvertResistToConcentration(self, resist):
-		return 'function undefinded'
+	def _convertResistToConcentration(self, resist):
+		return 'function undefined'
+
+	def _findResistInterval(self, resist):
+		if resist < self.ResistToConcent[0][0]: # smaller then first one
+			return -1
+		for i in range(len(self.ResistToConcent)-1):
+			if resist >= self.ResistToConcent[i][0] and resist < self.ResistToConcent[i+1][0]:
+				return i
+		else:
+			return len(self.ResistToConcent)-1
 
 # Unit test
 class Test_AlcoholSensor(unittest.TestCase):
@@ -91,8 +101,21 @@ class Test_AlcoholSensor(unittest.TestCase):
 		self.assertEqual(list, type(self.my_alcohol_sensor.ResistToConcent))
 		self.assertTrue(len(self.my_alcohol_sensor.ResistToConcent)>0)
 
-	def test_ConvertResistToConcentration(self):
-		self.my_alcohol_sensor._ConvertResistToConcentration(1)
+	def test_convertResistToConcentration(self):
+		self.my_alcohol_sensor._convertResistToConcentration(1)
+
+	def test_findResistInterval(self):
+		self.my_alcohol_sensor.ResistToConcent = [[1,0],[2,0],[3.0],[5,0],[6,0],[9,0],[22,0]]
+		interval = self.my_alcohol_sensor._findResistInterval(1.5)
+		self.assertEqual(0, interval)
+		interval = self.my_alcohol_sensor._findResistInterval(4.4)
+		self.assertEqual(2, interval)
+		interval = self.my_alcohol_sensor._findResistInterval(3)
+		self.assertEqual(2, interval)
+		interval = self.my_alcohol_sensor._findResistInterval(0.5)
+		self.assertEqual(-1, interval)
+		interval = self.my_alcohol_sensor._findResistInterval(23)
+		self.assertEqual(6, interval)
 
 '''def usage_example():
 	alcohol_sensor(ch=0)
