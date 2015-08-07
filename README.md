@@ -13,6 +13,8 @@ this implementation include few hardware stuff.
 * MCP3008 D-out ---> Rpi SPI_MISO
 * MCP3008 D-in ---> Rpi SPI_MOSI
 * MCP3008 CS/SHDN ---> SPI_CE0_N
+![MCP3008 pins](https://raw.githubusercontent.com/owl3808/alcohol_sensor/master/doc/mcp2008_pin.gif)
+![Raspberry Pi B+ Pins](https://raw.githubusercontent.com/owl3808/alcohol_sensor/master/doc/rpi_GPIO.png)
 
 ## Software
 ### Pre-work
