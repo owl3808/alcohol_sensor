@@ -12,8 +12,8 @@ class alcohol_sensor:
 		self.spi.open(0,0)
 		# Define sensor channels
 		self.alcohol_ch = ch
-		self.Vc = 5 # referance voltage
-		self.Rl = 200000 # load resistance
+		self.Vc = 5.0 # referance voltage
+		#self.Rl = 200000 # load resistance
 		self.RsroToConcentFile = 'MQ3Data.json'
 		self.ResistToConcent = []
 		self._loadMQ3Data()
@@ -24,7 +24,8 @@ class alcohol_sensor:
 		RsroToConcent = data['RsroConcentration_Mapping']
 		Ro = data['Ro']
 		self.ResistToConcent = [ [i[0]*Ro, i[1]] for i in RsroToConcent]
-		#print self.ResistToConcent
+		print self.ResistToConcent
+		self.Rl = data['Rl']
 
 	# Read SPI data from MCP3008, Channel must be an integer 0-7
 	def _ReadADC(self):
@@ -59,7 +60,7 @@ class alcohol_sensor:
 		volts = self.getVolts()
 		resist = self._ConvertVoltsToResist(volts)
 		concent = self._convertResistToConcentration(resist)
-		#print 'resist:%f  concent: %f' % (resist, concent)
+		print 'resist:%f  concent: %f' % (resist, concent)
 		return concent
 
 	def _convertResistToConcentration(self, resist):
