@@ -36,8 +36,18 @@ unittest.main()
 run alcohol_sensor.py
 
 ### Config
-to adjust accuracy, please edit file MQ3Data.json.
+to calibration, accurate the result, please edit file MQ3Data.json.
 this file is write in JSON formate, include some parameters.
 * RsroConcentration_Mapping: a mapping list convert from MQ-3 document figure.
 * Ro: resistance when alcohol concentration 0.4 mg/L, currently not confirmed, just a temporaray value.
 * Rl: resistance of variable resistor, also currently not confirmed just a temporaray value.
+
+
+## Calibration
+I'm try to figure out a method to calibrate,
+with our simple equipment, I have no any ideal for that.
+If any ideal, please inform me.
+
+There's what I had try to do.
+At first I want to use a 2L plastic bottle with some ethanol in it,
+but 0.0057 "mg" is such a slight unit, that we are not able to measure.
