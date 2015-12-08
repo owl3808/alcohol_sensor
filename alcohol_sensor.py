@@ -66,9 +66,9 @@ class alcohol_sensor:
 	def _convertResistToConcentration(self, resist):
 		interval = self._findResistInterval(resist)
 		if interval==-1:
-			return 0
+			return 0 # less then alc_sensor curve table
 		if interval == len(self.ResistToConcent)-1:
-			return 9999
+			return 10 # higher  then alc_sencor curve table
 		# interpolation method to get concentation
 		resist_l = self.ResistToConcent[interval][0]
 		resist_h = self.ResistToConcent[interval+1][0]
