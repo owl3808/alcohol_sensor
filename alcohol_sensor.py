@@ -1,9 +1,11 @@
+# -*- coding: UTF-8 -*-
 import spidev
 import time
 import os
 import unittest
 import json
 import numpy as np
+audio_dir = './audio'
 
 class alcohol_sensor:
 	def __init__(self, ch):
@@ -68,7 +70,7 @@ class alcohol_sensor:
 		if interval==-1:
 			return 0 # less then alc_sensor curve table
 		if interval == len(self.ResistToConcent)-1:
-			return 10 # higher  then alc_sencor curve table
+			return 3 # higher  then alc_sencor curve table
 		# interpolation method to get concentation
 		resist_l = self.ResistToConcent[interval][0]
 		resist_h = self.ResistToConcent[interval+1][0]
@@ -85,8 +87,7 @@ class alcohol_sensor:
 				return i
 		else:
 			return len(self.ResistToConcent)-1
-
-
+       
 # Unit test
 class Test_AlcoholSensor(unittest.TestCase):
 	def setUp(self):
@@ -126,7 +127,7 @@ class Test_AlcoholSensor(unittest.TestCase):
 	def test_convertResistToConcentration(self):
 		self.my_alcohol_sensor.ResistToConcent = [[22,0],[9,1],[6,2],[5,3],[3,4],[2,5],[1,6]]
 		concert = self.my_alcohol_sensor._convertResistToConcentration(0.5)
-		self.assertEqual(9999, concert)
+		self.assertEqual(3, concert)
 		concert = self.my_alcohol_sensor._convertResistToConcentration(1.5)
 		self.assertEqual(5.5, concert)
 		concert = self.my_alcohol_sensor._convertResistToConcentration(3.2)
@@ -153,12 +154,41 @@ def usage_example():
 	alchl_sensor = alcohol_sensor(ch=0)
 	# Define delay between readings
 	delay = 1
+	import pygame
+	pygame.mixer.pre_init(44100, -16, 2048)
+	pygame.init()
+	pygame.mixer.init()
 
 	while True:
 		concent = alchl_sensor.getConcentration()
 
 		# Print out results
 		print "alcohol %f" % concent
+		if concent == 0:
+			pygame.mixer.music.load(audio_dir + '/aloc0.mp3')
+			pygame.mixer.music.play(1)
+			print ""
+		elif concent <= 0.15:
+			pygame.mixer.music.load(audio_dir + '/aloc0-015.mp3')
+			pygame.mixer.music.play(1)
+			print ""
+		elif concent > 0.15 and concent < 0.25:
+			pygame.mixer.music.load(audio_dir + '/aloc015-025.mp3')
+			pygame.mixer.music.play(1)
+			print ""
+		elif concent >= 0.25 and concent < 0.4:
+			pygame.mixer.music.load(audio_dir + '/aloc025-040.mp3')
+			pygame.mixer.music.play(1)
+			print ""
+		elif concent >= 0.4 and concent < 0.55:
+			pygame.mixer.music.load(audio_dir + '/aloc040-055.mp3')
+			print ""
+		else :
+			print ""
+			pygame.mixer.music.load(audio_dir + '/aloc055.mp3')
+			pygame.mixer.music.play(1)
+		localtime = time.asctime( time.localtime(time.time()) )
+		print "", localtime
 
 		# Delay seconds
 		time.sleep(delay)
