@@ -33,7 +33,8 @@ unittest.main()
 ```
 
 ### Execute
-run alcohol_sensor.py
+execute ui.py
+<code>$ python ui.py</code>
 
 ### Config
 to calibration, accurate the result, please edit file MQ3Data.json.
