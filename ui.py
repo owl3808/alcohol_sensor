@@ -76,7 +76,7 @@ class fack_alcosensor:
 def test():
 	global alchl_sensor
 	alchl_sensor =  fack_alcosensor()
-	alchl_sensor.value = 0.22 # set alco value
+	alchl_sensor.value = 0.3 # set alco value
 	pygame.mixer.pre_init(44100, -16, 2048)
 	pygame.init()
 	pygame.mixer.init()
@@ -88,6 +88,7 @@ def test():
 # Main function
 def main():
 	from alcohol_sensor import alcohol_sensor
+	global alchl_sensor
 	alchl_sensor = alcohol_sensor(ch=0)
 	pygame.mixer.pre_init(44100, -16, 2048)
 	pygame.init()
@@ -98,7 +99,7 @@ def main():
 	sys.exit(app.exec_())
 
 # single pc test
-#test()
+test()
 
 # main
-main()
+#main()
