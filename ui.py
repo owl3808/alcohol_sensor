@@ -12,27 +12,28 @@ audio_path=os.getcwd() + "/audio"
 class TestWidget(QWidget):
 	def __init__(self):
 		QWidget.__init__(self, windowTitle=u"A Simple Example for PyQt.")
-		self.outputArea=QLabel()
-		self.outputArea.setText(u'開車不喝酒 喝酒不開車\n開車前請進行酒測')
+		self.picArea=QLabel()
+		self.textArea=QLabel()
+		self.textArea.setText(u'開車不喝酒 喝酒不開車\n開車前請進行酒測')
 		self.startButton=QPushButton(u"開始酒測", self)
 		self.setStyleSheet('font-size: 18pt; font-family: Courier;')
 		self.startButton.clicked.connect(self.startTest)
 
 		self.setLayout(QVBoxLayout())
-		self.layout().addWidget(self.outputArea)
+		self.layout().addWidget(self.picArea)
+		self.layout().addWidget(self.textArea)
 		self.layout().addWidget(self.startButton)
 		#self.showFullScreen()
 
-
 	def startTest(self):
 		# do text
-		self.outputArea.setText(u"請開始吹氣")
-		self.outputArea.repaint()
+		self.textArea.setText(u"請開始吹氣")
+		self.textArea.repaint()
 		concent = 0
 		avg_concent = 0
 		for i in range(5):
-			self.outputArea.setText(u"請開始吹氣..."+str(5-i))
-			self.outputArea.repaint()
+			self.textArea.setText(u"請開始吹氣..."+str(5-i))
+			self.textArea.repaint()
 			for i in range(5):
 				concent = concent + alchl_sensor.getConcentration() * 0.2
 				sleep(0.2)
@@ -41,26 +42,32 @@ class TestWidget(QWidget):
 		# Print out results
 		print "alcohol %f" % concent
 		if avg_concent == 0:
-			self.outputArea.setPixmap(QPixmap(pic_path+'/1.jpg'))
-			pygame.mixer.music.load(audio_path + '/alc0.mp3')
+			self.textArea.setText(u'沒有喝酒')
+			self.picArea.setPixmap(QPixmap(pic_path+'/1.jpg'))
+			pygame.mixer.music.load(audio_path + '/alc000.mp3')
 			pygame.mixer.music.play(1)
 		elif avg_concent <= 0.15:
-			self.outputArea.setPixmap(QPixmap(pic_path+'/2.jpg'))
-			pygame.mixer.music.load(audio_path + '/alc0-015.mp3')
+			self.textArea.setText(u'有喝酒，法定容許值之內')
+			self.picArea.setPixmap(QPixmap(pic_path+'/2.jpg'))
+			pygame.mixer.music.load(audio_path + '/alc000-015.mp3')
 			pygame.mixer.music.play(1)
 		elif avg_concent > 0.15 and avg_concent < 0.25:
-			self.outputArea.setPixmap(QPixmap(pic_path+'/3.jpg'))
+			self.textArea.setText(u'法定罰鍰額度（新臺幣：元）:15,000~3,0000元')
+			self.picArea.setPixmap(QPixmap(pic_path+'/3.jpg'))
 			pygame.mixer.music.load(audio_path + '/alc015-025.mp3')
 			pygame.mixer.music.play(1)
 		elif avg_concent >= 0.25 and avg_concent < 0.4:
-			self.outputArea.setPixmap(QPixmap(pic_path+'/4.jpg'))
+			self.textArea.setText(u'法定罰鍰額度（新臺幣：元）:22,500~50,500元')
+			self.picArea.setPixmap(QPixmap(pic_path+'/4.jpg'))
 			pygame.mixer.music.load(audio_path + '/alc025-040.mp3')
 			pygame.mixer.music.play(1)
 		elif avg_concent >= 0.4 and avg_concent < 0.55:
-			self.outputArea.setPixmap(QPixmap(pic_path+'/5.jpg'))
+			self.textArea.setText(u'法定罰鍰額度（新臺幣：元）:45,000~84,000元')
+			self.picArea.setPixmap(QPixmap(pic_path+'/5.jpg'))
 			pygame.mixer.music.load(audio_path + '/alc040-055.mp3')
 		else :
-			self.outputArea.setPixmap(QPixmap(pic_path+'/6.jpg'))
+			self.textArea.setText(u'法定罰鍰額度（新臺幣：元）:67,500~90,000元')
+			self.picArea.setPixmap(QPixmap(pic_path+'/6.jpg'))
 			pygame.mixer.music.load(audio_path + '/alc055.mp3')
 			pygame.mixer.music.play(1)
 		#localtime = time.asctime( time.localtime(time.time()) )
